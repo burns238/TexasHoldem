@@ -20,22 +20,24 @@ object Holdem {
       case _  => r.toString.toInt
     }
     
+    def rankName = r match {
+      case 'A' => "Ace"
+      case 'K' => "King"
+      case 'Q' => "Queen"
+      case 'J' => "Jack"
+      case _   => r.toString  
+    }
+    
     def compare(that: Rank) = {
       this.rankScore - that.rankScore
     }
   }
   
-  def Card (rank: Char, suit: Char) = {    
-    getRank(rank) + " of " + getSuit(suit)
+  case class Card(rank: Rank, suit: Char) { 
+    override def toString = rank.rankName + " of " + getSuit(suit)
   }
   
-  def getRank(rank: Char) = rank match {
-      case 'A' => "Ace"
-      case 'K' => "King"
-      case 'Q' => "Queen"
-      case 'J' => "Jack"
-      case _   => rank.toString  
-  }
+
   
   def getSuit(suit: Char) = suit match {
       case 'H' => "Hearts"
@@ -45,28 +47,38 @@ object Holdem {
       case _   => suit.toString  
   }
  
-  def Highcard(cardOne: String, cardTwo: String) = {
-    val rankOne = Rank(cardOne.head)
-    val rankTwo = Rank(cardTwo.head)
-    if (rankOne > rankTwo) cardOne else cardTwo 
+  def Highcard(cardOne: Card, cardTwo: Card) = {
+    if (cardOne.rank > cardTwo.rank) cardOne else cardTwo 
   }
 }
 
 class HoldemTest extends FlatSpec with Matchers {
   
+  import Holdem._
+  
   "The 5H card" should "be called the five of hearts" in {
-    Holdem.Card('5', 'H').toString shouldBe "5 of Hearts"
+    Card(Rank('5'), 'H').toString shouldBe "5 of Hearts"
   }
   
   "The game" should "be able to determine the high card" in {
-    Holdem.Highcard("AD", "KH") shouldBe "AD"  
-    Holdem.Highcard("QS", "5C") shouldBe "QS"
-    Holdem.Highcard("6C", "8C") shouldBe "8C" 
+    Highcard(Card(Rank('A'), 'D'), Card(Rank('K'), 'H')) shouldBe "AD"  
+    Highcard(Card(Rank('Q'), 'S'), Card(Rank('5'), 'C')) shouldBe "QS"
+    Highcard(Card(Rank('6'), 'C'), Card(Rank('8'), 'C')) shouldBe "8C" 
   }
   
+  it should "be able to determine if a straight exists in two lists"
+    val hand = List("1C","2H")
+    val dealer = List("3D","5H","QH","4S","AS")
+    IsStraight(hand,dealer) shouldBe true
+    val hand2 = List("1C","3H")
+    val dealer2 = List("5D","7H","9H","10S","AS")
+    IsStraight(hand2,dealer2) shouldBe false
+  
   "Cards" should "have a rank" in {
-    Holdem.Card('5', 'H').rank shouldBe Holdem.Rank('5')
-    Holdem.Card('Q', 'S').rank shouldBe Holdem.Rank('Q')
+    Card(Rank('5'), 'H').rank shouldBe Rank('5')
+    Card(Rank('Q'), 'S').rank shouldBe Rank('Q')
   }
+  
+  
   
 }
