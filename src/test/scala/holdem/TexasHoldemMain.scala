@@ -184,6 +184,11 @@ class HoldemTest extends FlatSpec with Matchers {
       "0S".toCard
     }
   }
+  it should "not accept 3W" in {
+    intercept[MatchError] {
+      "3W".toCard
+    }
+  }
   it should "not accept 10Q" in {
     intercept[MatchError] {
       "10Q".toCard
