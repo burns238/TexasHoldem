@@ -6,13 +6,15 @@ import org.scalatest.Matchers
 
 object Holdem {
   
-  implicit def stringToCard(s: String): Card = s.toList match {
-    case '1' :: '0' :: s :: Nil => Card(Rank("10"), s)
-    case r :: s :: Nil => Card(Rank(r.toString),s)
-    case _ => throw new Exception(s + "is not a valid card")
+  implicit class StringCardOps(s: String) {
+    def toCard: Card = s.toList match {
+      case '1' :: '0' :: s :: Nil => Card(Rank("10"), s)
+      case r :: s :: Nil => Card(Rank(r.toString),s)
+      case _ => throw new Exception(s + "is not a valid card")
+    }    
   }
   
-  implicit def listStringsToListCards(s: List[String]): List[Card] = s.map(stringToCard(_))
+  implicit def listStringsToListCards(s: List[String]): List[Card] = s.map(_.toCard)
   
   case class Rank(r: String) extends Ordered[Rank]{
     
@@ -54,11 +56,11 @@ object Holdem {
       List(rank.r.toString, suit.toString).mkString
     }
     
-    override def equals(that: Any) = that match {
-      case that: Card => this.rank == that.rank && this.suit == that.suit
-      case that: String => this == stringToCard(that)
-      case _ => false
-    }
+    //override def equals(that: Any) = that match {
+    //  case that: Card => this.rank == that.rank && this.suit == that.suit
+    //  case that: String => this == that.toCard
+    //  case _ => false
+    //}
   }
   
   def getSuit(suit: Char) = suit match {
@@ -96,23 +98,23 @@ class HoldemTest extends FlatSpec with Matchers {
   import Holdem._
   
   "The 5H card" should "be called the five of hearts" in {
-    "5H".name shouldBe "5 of Hearts"
+    "5H".toCard.name shouldBe "5 of Hearts"
   }
   
   "The game" should "be able to determine the high card" in {
-    Highcard("AD", "KH") shouldBe "AD"
-    Highcard("QS", "5C") shouldBe "QS"
-    Highcard("6C", "8C") shouldBe "8C" 
+    Highcard("AD".toCard, "KH".toCard) shouldBe "AD".toCard
+    Highcard("QS".toCard, "5C".toCard) shouldBe "QS".toCard
+    Highcard("6C".toCard, "8C".toCard) shouldBe "8C".toCard
   }
   it should "be able to compare cards with strings" in {
-    Card(Rank("A"), 'D') shouldBe "AD" 
-    Card(Rank("Q"), 'S') shouldBe "QS"
-    Card(Rank("8"), 'C') shouldBe "8C"
+    Card(Rank("A"), 'D') shouldBe "AD".toCard 
+    Card(Rank("Q"), 'S') shouldBe "QS".toCard
+    Card(Rank("8"), 'C') shouldBe "8C".toCard
   }
   it should "be able to compare strings with cards" in {
-    "AD" shouldBe Card(Rank("A"), 'D') 
-    "QS" shouldBe Card(Rank("Q"), 'S')
-    "8C" shouldBe Card(Rank("8"), 'C')
+    "AD".toCard shouldBe Card(Rank("A"), 'D') 
+    "QS".toCard shouldBe Card(Rank("Q"), 'S')
+    "8C".toCard shouldBe Card(Rank("8"), 'C')
   }
   
   it should "know which ranks are adjacent" in {
@@ -137,8 +139,8 @@ class HoldemTest extends FlatSpec with Matchers {
   }
     
   "Cards" should "have a rank" in {
-    "5H".rank shouldBe Rank("5")
-    "QS".rank shouldBe Rank("Q")
+    "5H".toCard.rank shouldBe Rank("5")
+    "QS".toCard.rank shouldBe Rank("Q")
   }
   
   it should "be able to determine if a straight exists in two lists" in {
@@ -149,5 +151,17 @@ class HoldemTest extends FlatSpec with Matchers {
     val dealer2 = List("5D","7H","9H","10S","AS")
     IsStraight(hand2,dealer2) shouldBe false
   }
+  
+  it should "be able to determine if a flush exists " in {
+    val hand = List("AD","2D")
+    val dealer = List("3D","5H","QD","4D","AS")
+    IsFlush(hand,dealer) shouldBe true
+    val hand2 = List("AC","3H")
+    val dealer2 = List("5D","7H","9H","10S","AS")
+    IsFlush(hand2,dealer2) shouldBe false
+  }
+    
+ 
+  
   
 }
