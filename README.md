@@ -1,2 +1,4 @@
 # TexasHoldem
-Texas Hold'em
+It's Texas fucking Hold'em!
+
+Crikey!

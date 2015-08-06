@@ -10,7 +10,7 @@ object Holdem {
     def toCard: Card = s.toList match {
       case '1' :: '0' :: s :: Nil => Card(Rank("10"), s)
       case r :: s :: Nil => Card(Rank(r.toString),s)
-      case _ => throw new Exception(s + "is not a valid card")
+      case _ => throw new MatchError(s + "is not a valid card")
     }    
   }
   
@@ -91,6 +91,15 @@ object Holdem {
     val cardRanks = (hand.toSet union dealer.toSet).map(_.rank)
     allRunsOfLength(5, cardRanks).size > 0
   }
+  
+  def IsFlush(hand: List[Card], dealer: List[Card]): Boolean = {
+    val suits = Set('D', 'H', 'C', 'S')
+    val cardSuits = (hand ::: dealer).map(_.suit)
+    val suitCounts = for {
+      suit <- suits
+    } yield cardSuits count (_ == suit)
+    suitCounts.max >= 5
+  }
 }
 
 class HoldemTest extends FlatSpec with Matchers {
@@ -137,11 +146,6 @@ class HoldemTest extends FlatSpec with Matchers {
     Rank("A") adjacentTo Rank("3") shouldBe false
     Rank("3") adjacentTo Rank("A") shouldBe false
   }
-    
-  "Cards" should "have a rank" in {
-    "5H".toCard.rank shouldBe Rank("5")
-    "QS".toCard.rank shouldBe Rank("Q")
-  }
   
   it should "be able to determine if a straight exists in two lists" in {
     val hand = List("AC","2H")
@@ -161,7 +165,58 @@ class HoldemTest extends FlatSpec with Matchers {
     IsFlush(hand2,dealer2) shouldBe false
   }
     
- 
+  "Cards" should "have a rank" in {
+    "5H".toCard.rank shouldBe Rank("5")
+    "QS".toCard.rank shouldBe Rank("Q")
+  }
   
-  
+  "toCard" should "accept the Queen of Hearts" in {
+    "QH".toCard
+  }
+  it should "accept the Ace of Spades" in {
+    "AS".toCard
+  }
+  it should "accept the Five of clubs" in {
+    "5C".toCard
+  }
+  it should "not accept 0S" in {
+    intercept[MatchError] {
+      "0S".toCard
+    }
+  }
+  it should "not accept 10Q" in {
+    intercept[MatchError] {
+      "10Q".toCard
+    }
+  }
+  it should "not accept QQ" in {
+    intercept[MatchError] {
+      "QQ".toCard
+    }
+  }
+  it should "not accept 1S" in {
+    intercept[MatchError] {
+      "1S".toCard
+    }
+  }
+  it should "not accept 1" in {
+    intercept[MatchError] {
+      "1".toCard
+    }
+  }
+  it should "not accept S" in {
+    intercept[MatchError] {
+      "S".toCard
+    }
+  }
+  it should "not accept 123ABC" in {
+    intercept[MatchError] {
+      "123ABC".toCard
+    }
+  }
+  it should "not accept the empty string" in {
+    intercept[MatchError] {
+      "".toCard
+    }
+  }
 }
