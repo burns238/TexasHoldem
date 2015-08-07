@@ -7,23 +7,35 @@ import org.scalatest.Matchers
 object Holdem {
   
   implicit class StringCardOps(s: String) {
+   
     def toCard: Card = s.toList match {
-      case '1' :: '0' :: s :: Nil => Card(Rank("10"), s)
-      case r :: s :: Nil => Card(Rank(r.toString),s)
-      case _ => throw new MatchError(s + "is not a valid card")
+      case '1' :: '0' :: s => Card(Rank("10"), s.mkString.toSuit)
+      case r :: s => Card(Rank(r.toString), s.mkString.toSuit)
+      case _ => throw new MatchError(s + " is not a valid card")
     }    
+    
+    def toSuit: Suit = {
+      require(List("D","H","C","S") contains s)
+      s match {
+      case "D" => Diamonds
+      case "H" => Hearts
+      case "C" => Clubs
+      case "S" => Spades
+      } 
+    } 
   }
   
   implicit def listStringsToListCards(s: List[String]): List[Card] = s.map(_.toCard)
   
   case class Rank(r: String) extends Ordered[Rank]{
+    require(List("A","2","3","4","5","6","7","8","9","10","J","Q","K") contains r) 
     
     def rankScore = r match {
       case "A" => 14
       case "K" => 13
       case "Q" => 12
       case "J" => 11
-      case _  => r.toInt
+      case _   => r.toInt       
     }
     
     def rankName = r match {
@@ -48,27 +60,34 @@ object Holdem {
       (this.r == "2" && that.r == "A")
     }
   }
+ 
+ class Suit(s:String) {
+
+    def suitName = s match {
+      case "H" => "Hearts"
+      case "D" => "Diamonds"
+      case "S" => "Spades"
+      case "C" => "Clubs"  
+      case _   => throw new MatchError (s + " is not a valid rank.")    
+    }
+    
+  }
+    
+  object Diamonds extends Suit("D")
+  object Hearts extends Suit("H")
+  object Clubs extends Suit("C")
+  object Spades extends Suit("S")
   
-  case class Card(rank: Rank, suit: Char) { 
-    def name = rank.rankName + " of " + getSuit(suit)
+  
+  case class Card(rank: Rank, suit: Suit) { 
+    def name = rank.rankName + " of " + suit.suitName
+    
+    
     
     override def toString: String = {
       List(rank.r.toString, suit.toString).mkString
     }
-    
-    //override def equals(that: Any) = that match {
-    //  case that: Card => this.rank == that.rank && this.suit == that.suit
-    //  case that: String => this == that.toCard
-    //  case _ => false
-    //}
-  }
-  
-  def getSuit(suit: Char) = suit match {
-      case 'H' => "Hearts"
-      case 'D' => "Diamonds"
-      case 'S' => "Spades"
-      case 'C' => "Clubs"  
-      case _   => suit.toString  
+
   }
  
   def Highcard(cardOne: Card, cardTwo: Card) = {
@@ -93,7 +112,7 @@ object Holdem {
   }
   
   def IsFlush(hand: List[Card], dealer: List[Card]): Boolean = {
-    val suits = Set('D', 'H', 'C', 'S')
+    val suits = Set(Diamonds, Hearts, Clubs, Spades)
     val cardSuits = (hand ::: dealer).map(_.suit)
     val suitCounts = for {
       suit <- suits
@@ -116,14 +135,14 @@ class HoldemTest extends FlatSpec with Matchers {
     Highcard("6C".toCard, "8C".toCard) shouldBe "8C".toCard
   }
   it should "be able to compare cards with strings" in {
-    Card(Rank("A"), 'D') shouldBe "AD".toCard 
-    Card(Rank("Q"), 'S') shouldBe "QS".toCard
-    Card(Rank("8"), 'C') shouldBe "8C".toCard
+    Card(Rank("A"), Diamonds) shouldBe "AD".toCard 
+    Card(Rank("Q"), Spades) shouldBe "QS".toCard
+    Card(Rank("8"), Clubs) shouldBe "8C".toCard
   }
   it should "be able to compare strings with cards" in {
-    "AD".toCard shouldBe Card(Rank("A"), 'D') 
-    "QS".toCard shouldBe Card(Rank("Q"), 'S')
-    "8C".toCard shouldBe Card(Rank("8"), 'C')
+    "AD".toCard shouldBe Card(Rank("A"), Diamonds)
+    "QS".toCard shouldBe Card(Rank("Q"), Spades)
+    "8C".toCard shouldBe Card(Rank("8"), Clubs)
   }
   
   it should "know which ranks are adjacent" in {
@@ -180,42 +199,42 @@ class HoldemTest extends FlatSpec with Matchers {
     "5C".toCard
   }
   it should "not accept 0S" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "0S".toCard
     }
   }
   it should "not accept 3W" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "3W".toCard
     }
   }
   it should "not accept 10Q" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "10Q".toCard
     }
   }
   it should "not accept QQ" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "QQ".toCard
     }
   }
   it should "not accept 1S" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "1S".toCard
     }
   }
   it should "not accept 1" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "1".toCard
     }
   }
   it should "not accept S" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "S".toCard
     }
   }
   it should "not accept 123ABC" in {
-    intercept[MatchError] {
+    intercept[IllegalArgumentException] {
       "123ABC".toCard
     }
   }
@@ -223,5 +242,10 @@ class HoldemTest extends FlatSpec with Matchers {
     intercept[MatchError] {
       "".toCard
     }
+  }
+  it should "be able to determine if a royal flush exists" in {
+    val hand = List("AD","10D")
+    val dealer = List("JD","5H","QD","KD","AS")
+    IsRoyalFlush(hand,dealer) shouldBe true
   }
 }
