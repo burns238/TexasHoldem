@@ -49,7 +49,7 @@ class GameRulesTest extends FlatSpec with Matchers {
     Hand(hand2).isStraight shouldBe false
   }
   it should "be able to determine if a flush exists " in {
-    val hand1 = Set("AD","2D","3D","5H","QD","4D","AS") 
+    val hand1 = Set("AD","2D","3D","4D","5D","QH","AS") 
     val hand2 = Set("AC","3H","5D","7H","9H","10S","AS")
     Hand(hand1).isFlush shouldBe true
     Hand(hand2).isFlush shouldBe false
@@ -60,6 +60,11 @@ class GameRulesTest extends FlatSpec with Matchers {
   }
   it should "not find a straight flush in hand 3S, 4S, dealer 3C, 5S, KC, QC, 5H" in {
     val hand = Set("3S","4S","3C","5S","KC","QC","5H")
+    Hand(hand).isStraightFlush shouldBe false
+  }
+  
+  it should "not find a straight flush in hand where the straight is not the flush" in {
+    val hand = Set("AD","2D","3D","4D","5H","QD","AS") 
     Hand(hand).isStraightFlush shouldBe false
   }
   
