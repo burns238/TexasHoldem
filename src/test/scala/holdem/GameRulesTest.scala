@@ -6,6 +6,7 @@ import org.scalatest.Matchers
 import GameRules._
 
 class GameRulesTest extends FlatSpec with Matchers {
+  
   "The game" should "be able to determine the high card" in {
     highcard("AD".toCard, "KH".toCard) shouldBe "AD".toCard
     highcard("QS".toCard, "5C".toCard) shouldBe "QS".toCard
@@ -42,30 +43,24 @@ class GameRulesTest extends FlatSpec with Matchers {
     Rank("3") adjacentTo Rank("A") shouldBe false
   }
   it should "be able to determine if a straight exists in two lists" in {
-    val hand = List("AC","2H")
-    val dealer = List("3D","5H","QH","4S","AS")
-    isStraight(hand,dealer) shouldBe true
-    val hand2 = List("AC","3H")
-    val dealer2 = List("5D","7H","9H","10S","AS")
-    isStraight(hand2,dealer2) shouldBe false
+    val hand1 = Set("AC","2H","3D","5H","QH","4S","AS")
+    val hand2 = Set("AC","3H","5D","7H","9H","10S","AS")
+    Hand(hand1).isStraight shouldBe true
+    Hand(hand2).isStraight shouldBe false
   }
   it should "be able to determine if a flush exists " in {
-    val hand = List("AD","2D")
-    val dealer = List("3D","5H","QD","4D","AS")
-    isFlush(hand,dealer) shouldBe true
-    val hand2 = List("AC","3H")
-    val dealer2 = List("5D","7H","9H","10S","AS")
-    isFlush(hand2,dealer2) shouldBe false
+    val hand1 = Set("AD","2D","3D","5H","QD","4D","AS") 
+    val hand2 = Set("AC","3H","5D","7H","9H","10S","AS")
+    Hand(hand1).isFlush shouldBe true
+    Hand(hand2).isFlush shouldBe false
   }
-  it should "be able to determine if a royal flush exists" in {
-    val hand = List("AD","10D")
-    val dealer = List("JD","5H","QD","KD","AS")
-    isRoyalFlush(hand,dealer) shouldBe true
+  it should "be able to determine if a straight flush exists" in {
+    val hand = Set("AD","10D","JD","5H","QD","KD","AS")
+    Hand(hand).isStraightFlush shouldBe true
   }
-  it should "not find a royal flush in hand 3S, 4S, dealer 3C, 5S, KC, QC, 5H" in {
-    val hand = List("3S", "4S")
-    val dealer = List("3C", "5S", "KC", "QC", "5H")
-    isRoyalFlush(hand,dealer) shouldBe false
+  it should "not find a straight flush in hand 3S, 4S, dealer 3C, 5S, KC, QC, 5H" in {
+    val hand = Set("3S","4S","3C","5S","KC","QC","5H")
+    Hand(hand).isStraightFlush shouldBe false
   }
   
 }

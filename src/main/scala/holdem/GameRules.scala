@@ -21,32 +21,11 @@ object GameRules {
   }
   
   implicit def listStringsToListCards(s: List[String]): List[Card] = s.map(_.toCard)
+  implicit def setStringsToSetCards(s: Set[String]): Set[Card] = s.map(_.toCard)
  
-  def highcard(cardOne: Card, cardTwo: Card) = {
-    if (cardOne.rank > cardTwo.rank) cardOne else cardTwo 
-  }
   
-  def isStraight(hand: List[Card], dealer: List[Card]): Boolean = {
-    def allRunsOfLength(length: Int, ranks: Set[Rank]): Set[Set[Rank]] = {
-      if (length == 1) Set(ranks)
-      else {
-        for {
-          rank <- ranks
-          run <- allRunsOfLength(length - 1, ranks - rank)
-          if run.exists(x => x adjacentTo rank)
-        } yield run + rank
-      }
-    }
-    val cardRanks = (hand.toSet union dealer.toSet).map(_.rank)
-    allRunsOfLength(5, cardRanks).size > 0
-  }
-  def isFlush(hand: List[Card], dealer: List[Card]): Boolean = {
-    val suits = Set(Diamonds, Hearts, Clubs, Spades)
-    val cardSuits = (hand ::: dealer).map(_.suit)
-    val suitCounts = for {
-      suit <- suits
-    } yield cardSuits count (_ == suit)
-    suitCounts.max >= 5
-  }
-  def isRoyalFlush(hand: List[Card], dealer: List[Card]): Boolean = true
+    def highcard(cardOne: Card, cardTwo: Card) = {
+    if (cardOne.rank > cardTwo.rank) cardOne else cardTwo
+  }  
+  
 }
