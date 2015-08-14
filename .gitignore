@@ -20,3 +20,4 @@ project/plugins/project/
 .project
 .classpath
 .cache-tests
+.cache-main
