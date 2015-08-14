@@ -7,6 +7,18 @@ import GameRules._
 
 class GameRulesTest extends FlatSpec with Matchers {
   
+  // Ranking table:
+  //
+  // Royal Flush
+  // Four of a kind
+  // Full house
+  // Flush
+  // Straight
+  // Three of a kind
+  // Two pair
+  // Pair
+  // High card
+  
   "The game" should "be able to determine the high card" in {
     highcard("AD".toCard, "KH".toCard) shouldBe "AD".toCard
     highcard("QS".toCard, "5C".toCard) shouldBe "QS".toCard
@@ -62,10 +74,24 @@ class GameRulesTest extends FlatSpec with Matchers {
     val hand = Set("3S","4S","3C","5S","KC","QC","5H")
     Hand(hand).isStraightFlush shouldBe false
   }
-  
   it should "not find a straight flush in hand where the straight is not the flush" in {
     val hand = Set("AD","2D","3D","4D","5H","QD","AS") 
     Hand(hand).isStraightFlush shouldBe false
+  }  
+  it should "find two pairs in 4H, 4C, 5H, 9S, 5S" in {
+    val hand = Set("4H", "4C", "5H", "9S", "5S")
+    Hand(hand).rankGroups = Set(Set("4H", "4C"), Set("5H", "5S"))
   }
-  
+  it should "find three of a kind in KC, KS, 3D, 4H, KD" in {
+    val hand = Set("KC", "KS", "3D", "4H", "KD")
+    Hand(hand).rankGroups = Set(Set("KC","KS","KD"))
+  }
+  it should "find a pair in AC, 4S, 5D, JH, 4D" in {
+    val hand = Set("AC", "4S", "5D", "JH", "4D")
+    Hand(hand).rankGroups = Set(Set("4S", "4D"))
+  }
+  it should "find no groups in AC, 9D, 8S, 7S, QH" in {
+    val hand = Set("AC", "9D", "8S", "7S", "QH")
+    Hand(hand).rankGroups = Set(Set[Card]())
+  }
 }

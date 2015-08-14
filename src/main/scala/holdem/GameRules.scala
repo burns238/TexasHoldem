@@ -24,7 +24,7 @@ object GameRules {
   implicit def setStringsToSetCards(s: Set[String]): Set[Card] = s.map(_.toCard)
  
   
-    def highcard(cardOne: Card, cardTwo: Card) = {
+  def highcard(cardOne: Card, cardTwo: Card) = {
     if (cardOne.rank > cardTwo.rank) cardOne else cardTwo
   }  
   
