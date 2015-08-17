@@ -38,4 +38,16 @@ case class Hand(cards: Set[Card]) {
     groups.filter(_.size > 1)
   }
   
+  def rankGroupsAndTotalSize(groups: Int, totalSize: Int): Boolean = {
+    rankGroups.size == groups && rankGroups.map(_.size).sum == totalSize
+  }
+  
+  def isPair = rankGroupsAndTotalSize(1,2)
+  def isThreeOfAKind = rankGroupsAndTotalSize(1,3)
+  def isFourOfAKind = rankGroupsAndTotalSize(1,4)
+  def isTwoPairs = rankGroupsAndTotalSize(2,4)
+  def isFullHouse = rankGroupsAndTotalSize(2,5)
+  
+  
+  
 }
