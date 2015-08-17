@@ -22,6 +22,7 @@ object GameRules {
   
   implicit def listStringsToListCards(s: List[String]): List[Card] = s.map(_.toCard)
   implicit def setStringsToSetCards(s: Set[String]): Set[Card] = s.map(_.toCard)
+  implicit def setSetStringsToSetSetCards(s: Set[Set[String]]): Set[Set[Card]] = s.map(setStringsToSetCards)
  
   
   def highcard(cardOne: Card, cardTwo: Card) = {

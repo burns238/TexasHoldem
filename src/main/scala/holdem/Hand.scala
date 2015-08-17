@@ -26,16 +26,16 @@ case class Hand(cards: Set[Card]) {
   }
   
   def isFlush: Boolean = {
-    //val cardSuits = cards.map(_.suit)
-//    val suitCounts = for {
-//      suit <- suits
-//    } yield cards count (_.suit == suit)  
-//    suitCounts.max >= 5
     potentialFlushCards.size >= 5
   }
   
   def isStraightFlush: Boolean = {
     Hand(potentialFlushCards).isStraight
+  }
+  
+  def rankGroups: Set[Set[Card]] = {
+    val groups = cards.groupBy(_.rank).map(x=>x._2).toSet
+    groups.filter(_.size > 1)
   }
   
 }

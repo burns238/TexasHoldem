@@ -80,18 +80,44 @@ class GameRulesTest extends FlatSpec with Matchers {
   }  
   it should "find two pairs in 4H, 4C, 5H, 9S, 5S" in {
     val hand = Set("4H", "4C", "5H", "9S", "5S")
-    Hand(hand).rankGroups = Set(Set("4H", "4C"), Set("5H", "5S"))
+    Hand(hand).rankGroups shouldBe Set(Set("4H".toCard, "4C".toCard), Set("5H".toCard, "5S".toCard))
   }
   it should "find three of a kind in KC, KS, 3D, 4H, KD" in {
     val hand = Set("KC", "KS", "3D", "4H", "KD")
-    Hand(hand).rankGroups = Set(Set("KC","KS","KD"))
+    Hand(hand).rankGroups shouldBe Set(Set("KC".toCard,"KS".toCard,"KD".toCard))
   }
   it should "find a pair in AC, 4S, 5D, JH, 4D" in {
     val hand = Set("AC", "4S", "5D", "JH", "4D")
-    Hand(hand).rankGroups = Set(Set("4S", "4D"))
+    Hand(hand).rankGroups shouldBe Set(Set("4S".toCard, "4D".toCard))
   }
   it should "find no groups in AC, 9D, 8S, 7S, QH" in {
     val hand = Set("AC", "9D", "8S", "7S", "QH")
-    Hand(hand).rankGroups = Set(Set[Card]())
+    Hand(hand).rankGroups shouldBe Set[Card]()
   }
+  it should "find two pairs in this set of rankGroups" in {
+    val hand = Set("4H", "4C", "5H", "9S", "5S")
+    Hand(hand_).isTwoPairs shouldBe true
+    Hand(hand_).isPair shouldBe false
+  }
+  it should "find three of a kind in this set of rankGroups" in {
+    val hand = Set("KC", "KS", "3D", "4H", "KD")
+    Hand(hand_).isThreeOfAKind shouldBe true
+    Hand(hand_).isPair shouldBe false
+  }  
+  it should "find a pair in this set of rankGroups" in {
+    val hand = Set("AC", "4S", "5D", "JH", "4D")
+    Hand(hand_).isPair shouldBe true
+  }  
+  it should "find four of a kind in this set of rankGroups" in {
+    val hand = Set("AC", "AS", "AD", "AH", "4D")
+    Hand(hand_).isFourOfAKind shouldBe true
+    Hand(hand_).isThreeOfAKind shouldBe false
+    Hand(hand_).isPair shouldBe false
+  }  
+  it should "find a full house in this set of rankGroups" in {
+    val hand = Set("AC", "AS", "AD", "4H", "4D")
+    Hand(hand_).isFullHouse shouldBe true
+    Hand(hand_).isThreeOfAKind shouldBe false
+    Hand(hand_).isPair shouldBe false
+  }  
 }
