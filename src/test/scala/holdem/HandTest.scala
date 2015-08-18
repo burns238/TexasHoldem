@@ -82,7 +82,22 @@ class HandTest extends FlatSpec with Matchers {
   
   it should "be able to evaluate a pair hand and store it as the right type, picking up the relevant high cards" in {
     val hand = Set("5C", "5D", "3S", "JH", "10C", "6D", "QC")
-    Hand(hand).evaluate shouldBe PairHand(Set("5C", "5D"), Set("QC", "JH", "10C"))
+    Hand(hand).evaluate shouldBe PairHand(Set("5C".toCard, "5D".toCard), Set("QC".toCard, "JH".toCard, "10C".toCard))   
   }
-  
+  it should "be able to evaluate a Three of a Kind hand and store it as the right type, picking up the relevant high cards" in {
+    val hand = Set("5C", "5D", "5S", "JH", "10C", "6D", "QC")
+    Hand(hand).evaluate shouldBe ThreeOfAKindHand(Set("5C".toCard, "5D".toCard, "5S".toCard), Set("QC".toCard, "JH".toCard))  
+  }
+  it should "be able to evaluate a Four of a Kind hand and store it as the right type, picking up the relevant high cards" in {
+    val hand = Set("5C", "5D", "5S", "JH", "5H", "6D", "QC")
+    Hand(hand).evaluate shouldBe FourOfAKindHand(Set("5C".toCard, "5D".toCard, "5S".toCard, "5C".toCard), Set("QC".toCard))    
+  }
+  it should "be able to evaluate a Two Pair hand and store it as the right type, picking up the relevant high cards" in {
+    val hand = Set("5C", "5D", "6S", "JH", "4C", "6D", "QC")
+    Hand(hand).evaluate shouldBe TwoPairHand(Set("5C".toCard, "5D".toCard, "6S".toCard, "6D".toCard), Set("QC".toCard))    
+  }  
+  it should "be able to evaluate a Full House hand and store it as the right type, picking up the relevant high cards" in {
+    val hand = Set("5C", "5D", "6S", "JH", "5H", "6D", "QC")
+    Hand(hand).evaluate shouldBe FullHouseHand(Set("5C".toCard, "5D".toCard, "5H".toCard,"6S".toCard, "6D".toCard))    
+  }  
 }

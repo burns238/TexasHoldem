@@ -1,5 +1,8 @@
 package holdem
 
+import scala.collection.immutable
+import scala.math.Ordering.Implicits._
+
 case class Hand(cards: Set[Card]) {
   
   val suits = Set(Diamonds, Hearts, Clubs, Spades)
@@ -48,6 +51,14 @@ case class Hand(cards: Set[Card]) {
   def isTwoPairs = rankGroupsAndTotalSize(2,4)
   def isFullHouse = rankGroupsAndTotalSize(2,5)
   
+  def evaluate = cards match {
+    case isPair => PairHand(rankGroups.head,completeHand((cards.--(rankGroups.head)),3))  
+  }
   
-  
+  def completeHand(cards: Set[Card], number: Int) = {
+    val byRank = cards.toList.sorted.reverse
+    (byRank.take(number)).toSet
+  }
 }
+
+case class PairHand(pair: Set[Card], rest: Set[Card]) 
