@@ -33,19 +33,19 @@ class HandTest extends FlatSpec with Matchers {
   }  
   it should "find two pairs in 4H, 4C, 5H, 9S, 5S" in {
     val hand = Set("4H", "4C", "5H", "9S", "5S")
-    Hand(hand).rankGroups shouldBe Set(Set("4H".toCard, "4C".toCard), Set("5H".toCard, "5S".toCard))
+    Hand(hand).rankGroupProfile shouldBe List(2,2,1)
   }
   it should "find three of a kind in KC, KS, 3D, 4H, KD" in {
     val hand = Set("KC", "KS", "3D", "4H", "KD")
-    Hand(hand).rankGroups shouldBe Set(Set("KC".toCard,"KS".toCard,"KD".toCard))
+    Hand(hand).rankGroupProfile shouldBe List(3,1,1)
   }
   it should "find a pair in AC, 4S, 5D, JH, 4D" in {
     val hand = Set("AC", "4S", "5D", "JH", "4D")
-    Hand(hand).rankGroups shouldBe Set(Set("4S".toCard, "4D".toCard))
+    Hand(hand).rankGroupProfile shouldBe List(2,1,1,1)
   }
   it should "find no groups in AC, 9D, 8S, 7S, QH" in {
     val hand = Set("AC", "9D", "8S", "7S", "QH")
-    Hand(hand).rankGroups shouldBe Set[Card]()
+    Hand(hand).rankGroupProfile shouldBe List(1,1,1,1,1)
   }
   it should "find two pairs in this set of rankGroups" in {
     val hand = Set("4H", "4C", "5H", "9S", "5S")
@@ -90,14 +90,29 @@ class HandTest extends FlatSpec with Matchers {
   }
   it should "be able to evaluate a Four of a Kind hand and store it as the right type, picking up the relevant high cards" in {
     val hand = Set("5C", "5D", "5S", "JH", "5H", "6D", "QC")
-    Hand(hand).evaluate shouldBe FourOfAKindHand(Set("5C".toCard, "5D".toCard, "5S".toCard, "5C".toCard), Set("QC".toCard))    
+    Hand(hand).evaluate shouldBe FourOfAKindHand(Set("5H".toCard, "5D".toCard, "5S".toCard, "5C".toCard), Set("QC".toCard))    
   }
   it should "be able to evaluate a Two Pair hand and store it as the right type, picking up the relevant high cards" in {
     val hand = Set("5C", "5D", "6S", "JH", "4C", "6D", "QC")
-    Hand(hand).evaluate shouldBe TwoPairHand(Set("5C".toCard, "5D".toCard, "6S".toCard, "6D".toCard), Set("QC".toCard))    
+    Hand(hand).evaluate shouldBe TwoPairHand(Set("6S".toCard, "6D".toCard), Set("5C".toCard, "5D".toCard), Set("QC".toCard))    
   }  
   it should "be able to evaluate a Full House hand and store it as the right type, picking up the relevant high cards" in {
     val hand = Set("5C", "5D", "6S", "JH", "5H", "6D", "QC")
-    Hand(hand).evaluate shouldBe FullHouseHand(Set("5C".toCard, "5D".toCard, "5H".toCard,"6S".toCard, "6D".toCard))    
-  }  
+    Hand(hand).evaluate shouldBe FullHouseHand(Set("5C".toCard, "5D".toCard, "5H".toCard), Set("6S".toCard, "6D".toCard))    
+  } 
+  
+  it should "know that a pair of 7s beats a pair of 4s" in {
+    val pairOfSevens = Set("7D", "7H", "3S", "QH", "10D")
+    val pairOfFours = Set("4C", "4D", "QS", "JH", "2S")
+    (Hand(pairOfSevens).evaluate > Hand(pairOfFours).evaluate) shouldBe true
+    (Hand(pairOfSevens).evaluate < Hand(pairOfFours).evaluate) shouldBe false
+  }
+  it should "know that in a showdown between two pairs of 10s, the one with the ace beats the one without" in {
+    val pairOfTensAceHigh = Set("10C", "AH", "JC", "4S", "10S")
+    val pairOfTensJackHigh = Set("JC", "10D", "10H", "3S", "9C")
+    (Hand(pairOfTensAceHigh).evaluate > Hand(pairOfTensJackHigh).evaluate) shouldBe true
+    (Hand(pairOfTensAceHigh).evaluate < Hand(pairOfTensJackHigh).evaluate) shouldBe false
+  }
+  
+  
 }
