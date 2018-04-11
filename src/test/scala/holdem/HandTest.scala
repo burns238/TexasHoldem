@@ -104,14 +104,21 @@ class HandTest extends FlatSpec with Matchers {
   it should "know that a pair of 7s beats a pair of 4s" in {
     val pairOfSevens = Set("7D", "7H", "3S", "QH", "10D")
     val pairOfFours = Set("4C", "4D", "QS", "JH", "2S")
-    (Hand(pairOfSevens).evaluate > Hand(pairOfFours).evaluate) shouldBe true
-    (Hand(pairOfSevens).evaluate < Hand(pairOfFours).evaluate) shouldBe false
+    (Hand(pairOfSevens) > Hand(pairOfFours)) shouldBe true
+    (Hand(pairOfSevens) < Hand(pairOfFours)) shouldBe false
   }
   it should "know that in a showdown between two pairs of 10s, the one with the ace beats the one without" in {
     val pairOfTensAceHigh = Set("10C", "AH", "JC", "4S", "10S")
     val pairOfTensJackHigh = Set("JC", "10D", "10H", "3S", "9C")
-    (Hand(pairOfTensAceHigh).evaluate > Hand(pairOfTensJackHigh).evaluate) shouldBe true
-    (Hand(pairOfTensAceHigh).evaluate < Hand(pairOfTensJackHigh).evaluate) shouldBe false
+    (Hand(pairOfTensAceHigh) > Hand(pairOfTensJackHigh)) shouldBe true
+    (Hand(pairOfTensAceHigh) < Hand(pairOfTensJackHigh)) shouldBe false
+  }
+
+  it should "know that in a showdown between a pair of 10s and a high card, the pair wins" in {
+    val pairOfTensAceHigh = Set("10C", "5H", "JC", "4S", "10S")
+    val pairOfTensJackHigh = Set("JC", "10D", "AH", "3S", "9C")
+    (Hand(pairOfTensAceHigh) > Hand(pairOfTensJackHigh)) shouldBe true
+    (Hand(pairOfTensAceHigh) < Hand(pairOfTensJackHigh)) shouldBe false
   }
   
   

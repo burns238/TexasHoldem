@@ -3,7 +3,7 @@ package holdem
 case class Rank(r: String) extends Ordered[Rank]{
   require(List("A","2","3","4","5","6","7","8","9","10","J","Q","K") contains r) 
   
-  def rankScore = r match {
+  def rankScore: Int = r match {
     case "A" => 14
     case "K" => 13
     case "Q" => 12

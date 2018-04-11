@@ -3,7 +3,7 @@ package holdem
 import scala.collection.immutable
 import scala.math.Ordering.Implicits._
 
-case class Hand(cards: Set[Card]) {
+case class Hand(cards: Set[Card]) extends Ordered[Hand]{
   
   val suits = Set(Diamonds, Hearts, Clubs, Spades)
   
@@ -72,6 +72,33 @@ case class Hand(cards: Set[Card]) {
     val byRank = cards.toList.sorted.reverse
     (byRank.take(number)).toSet
   }
+
+  def handScore: Int = {
+    this.evaluate match {
+      case FullHouseHand(threeOfAKind, pair) => 6
+      case FourOfAKindHand(fourOfAKind, rest) => 5
+      case ThreeOfAKindHand(threeOfAKind, rest) => 4
+      case TwoPairHand(pair1, pair2, rest) => 3
+      case PairHand(pair, rest) => 2
+      case HighCardHand(rest) => 1
+    }
+  }
+
+  def comparePairHand(thisPairHand: PairHand, thatPairHand: PairHand): Int = {
+    (thisPairHand.pair.map(_.rank.rankScore).sum - thatPairHand.pair.map(_.rank.rankScore).sum) match {
+      case 0 => (thisPairHand.rest.map(_.rank.rankScore).sum - thatPairHand.rest.map(_.rank.rankScore).sum)
+      case result => result
+    }
+
+  }
+
+  def compare(that: Hand) = {
+    (this.evaluate, that.evaluate) match {
+      case (PairHand(thisPair, thisRest), PairHand(thatPair, thatRest)) => comparePairHand(PairHand(thisPair, thisRest), PairHand(thatPair, thatRest))
+      case _ => 0
+    }
+  }
+
 }
 
 case class HighCardHand(rest: Set[Card])
